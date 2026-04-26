@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Add Admin User -->
+    <changeSet id="2" author="medical-system">
+        <!-- Insert Admin User -->
+        <insert tableName="users">
+            <column name="email" value="admin@medical-system.com"/>
+            <column name="password_hash" value="$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy"/>
+            <column name="full_name" value="Администратор Системы"/>
+            <column name="phone" value="+7 (999) 000-00-01"/>
+            <column name="role" value="ADMIN"/>
+            <column name="is_blocked" valueBoolean="false"/>
+            <column name="created_at" valueDate="NOW()"/>
+        </insert>
+    </changeSet>
+
+    <!-- Add Doctor Users -->
+    <changeSet id="3" author="medical-system">
+        <!-- Insert Doctor 1 - Therapist -->
+        <insert tableName="users">
+            <column name="email" value="doctor.petrov@medical-system.com"/>
+            <column name="password_hash" value="$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy"/>
+            <column name="full_name" value="Петров Петр Петрович"/>
+            <column name="phone" value="+7 (999) 000-00-02"/>
+            <column name="role" value="DOCTOR"/>
+            <column name="is_blocked" valueBoolean="false"/>
+            <column name="created_at" valueDate="NOW()"/>
+        </insert>
+
+        <!-- Insert Doctor Profile 1 -->
+        <insert tableName="doctors">
+            <column name="user_id" valueComputed="(SELECT id FROM users WHERE email = 'doctor.petrov@medical-system.com')"/>
+            <column name="description" value="Ведущий специалист в области терапии. Специализируется на диагностике и лечении внутренних болезней."/>
+            <column name="experience_years" valueNumeric="12"/>
+            <column name="education" value="Белорусский государственный медицинский университет, 2014"/>
+            <column name="rating" valueNumeric="4.9"/>
+            <column name="total_ratings" valueNumeric="124"/>
+        </insert>
+
+        <!-- Insert Doctor 2 - Cardiologist -->
+        <insert tableName="users">
+            <column name="email" value="doctor.sidorova@medical-system.com"/>
+            <column name="password_hash" value="$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy"/>
+            <column name="full_name" value="Сидорова Анна Михайловна"/>
+            <column name="phone" value="+7 (999) 000-00-03"/>
+            <column name="role" value="DOCTOR"/>
+            <column name="is_blocked" valueBoolean="false"/>
+            <column name="created_at" valueDate="NOW()"/>
+        </insert>
+
+        <!-- Insert Doctor Profile 2 -->
+        <insert tableName="doctors">
+            <column name="user_id" valueComputed="(SELECT id FROM users WHERE email = 'doctor.sidorova@medical-system.com')"/>
+            <column name="description" value="Врач-кардиолог высшей категории. Эксперт в области диагностики и лечения сердечно-сосудистых заболеваний."/>
+            <column name="experience_years" valueNumeric="15"/>
+            <column name="education" value="Белорусский государственный медицинский университет, 2011"/>
+            <column name="rating" valueNumeric="5.0"/>
+            <column name="total_ratings" valueNumeric="89"/>
+        </insert>
+
+        <!-- Insert Doctor 3 - Neurologist -->
+        <insert tableName="users">
+            <column name="email" value="doctor.ivanova@medical-system.com"/>
+            <column name="password_hash" value="$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy"/>
+            <column name="full_name" value="Иванова Елена Юрьевна"/>
+            <column name="phone" value="+7 (999) 000-00-04"/>
+            <column name="role" value="DOCTOR"/>
+            <column name="is_blocked" valueBoolean="false"/>
+            <column name="created_at" valueDate="NOW()"/>
+        </insert>
+
+        <!-- Insert Doctor Profile 3 -->
+        <insert tableName="doctors">
+            <column name="user_id" valueComputed="(SELECT id FROM users WHERE email = 'doctor.ivanova@medical-system.com')"/>
+            <column name="description" value="Врач-невролог. Специализируется на диагностике и лечении заболеваний нервной системы."/>
+            <column name="experience_years" valueNumeric="8"/>
+            <column name="education" value="Белорусский государственный медицинский университет, 2018"/>
+            <column name="rating" valueNumeric="4.8"/>
+            <column name="total_ratings" valueNumeric="56"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

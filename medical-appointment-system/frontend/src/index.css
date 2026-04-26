@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+/* ========================================
+   МЕДИЦИНСКИЙ СЕРВИС - ПРЕМИАЛЬНЫЙ ДИЗАЙН
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+@theme {
+  /* Палитра от пользователя: Blues & Minimal Red Accent */
+  --color-brand-primary: #657fad;    /* Medium Blue - Shadows, primary icons */
+  --color-brand-secondary: #002666;  /* Dark Blue - Headers, main buttons, DARK background */
+  --color-brand-soft: #c8d3e6;       /* Light Blue - Secondary elements, LIGHT background */
+  --color-brand-accent: #ad0000;     /* Red - Minimal accent */
+  --color-brand-bg: #f0f4f8;         /* Very Light Blue - Main background */
+  
+  --color-brand-on-dark: #ffffff;    /* Текст на темном фоне - ВСЕГДА БЕЛЫЙ */
+  --color-brand-on-light: #002666;   /* Текст на светлом фоне - ВСЕГДА ТЕМНО-СИНИЙ */
+  
+  --color-surface-card: #ffffff;
+  --color-surface-bg: #f0f4f8;
+  --color-surface-dark: #002666;
+
+  --color-status-success: #10B981;
+  --color-status-warning: #F59E0B;
+  --color-status-error: #ad0000;
+
+  /* Jakarta Sans для более современного вида */
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui;
+
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+
+  --shadow-premium: 0 10px 40px -10px rgba(101, 127, 173, 0.2), 0 5px 20px -5px rgba(0, 38, 102, 0.1);
+  --shadow-hover: 0 20px 50px -12px rgba(101, 127, 173, 0.3), 0 10px 20px -8px rgba(0, 38, 102, 0.15);
+  
+  --animate-fade-up: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-scale-in: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  --animate-float: float 6s ease-in-out infinite;
+}
+
+@utility glass-card {
+  background: #ffffff; /* Убираем прозрачность для максимального контраста */
+  border: 2px solid var(--color-brand-soft);
+  box-shadow: var(--shadow-premium);
+  color: var(--color-brand-on-light);
+}
+
+@utility dark-card {
+  background: var(--color-brand-secondary);
+  color: var(--color-brand-on-dark);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-premium);
+}
+
+@utility neon-glow {
+  box-shadow: 0 0 20px rgba(101, 127, 173, 0.4);
+}
+
+@utility premium-card {
+  @apply bg-white rounded-3xl shadow-premium transition-all duration-500 border-2 border-brand-soft text-brand-on-light overflow-hidden;
+  &:hover {
+    @apply shadow-hover -translate-y-2 border-brand-primary;
+  }
+}
+
+@utility soft-bg {
+  @apply bg-brand-soft border-2 border-brand-soft text-brand-on-light;
+}
+
+@utility btn-glow {
+  @apply relative overflow-hidden transition-all duration-300;
+  &::after {
+    content: '';
+    @apply absolute inset-0 bg-white/20 translate-y-full transition-transform duration-300;
+  }
+  &:hover::after {
+    @apply translate-y-0;
+  }
+}
+
+:root {
+  --primary: #657fad;
+  --secondary: #002666;
+  --accent: #ad0000;
+  --bg-main: #f0f4f8;
+  --text-main: #002666;
+  
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+}
+
+body {
+  @apply bg-brand-bg text-brand-on-light font-sans antialiased;
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Глобальные стили для контраста */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-black tracking-tight;
+}
+
+p, span, label, input {
+  @apply font-bold; /* Делаем весь текст жирнее для лучшей читаемости */
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+body {
+  background-color: var(--bg-main);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(0, 102, 255, 0.03) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(0, 240, 255, 0.03) 0px, transparent 50%);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}

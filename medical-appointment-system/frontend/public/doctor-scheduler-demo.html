@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Запись к врачу</title>
+  <style>
+    :root {
+      --bg: #f4f8fb;
+      --panel: #ffffff;
+      --line: #d7e3ee;
+      --text: #1f3347;
+      --muted: #7a8ea5;
+      --primary: #2a78d1;
+      --primary-soft: #e6f1fd;
+      --accent: #1ea37a;
+      --weekend: #ffeef0;
+      --today: #fff4cc;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(180deg, #f7fbff 0%, var(--bg) 100%);
+      color: var(--text);
+      padding: 24px;
+    }
+
+    .layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .page-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(30, 82, 134, 0.08);
+      padding: 20px;
+    }
+
+    .page-title {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .scheduler {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px;
+      background: #fcfeff;
+    }
+
+    .doctor-name {
+      margin: 0 0 16px;
+      font-size: 22px;
+      color: #0e4d84;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .arrow-btn, select {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      padding: 8px 12px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .arrow-btn:hover, select:hover {
+      border-color: #9ec3e8;
+      background: #f5faff;
+    }
+
+    .calendar-head, .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(38px, 1fr));
+      gap: 6px;
+    }
+
+    .weekday {
+      text-align: center;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--muted);
+      padding: 4px 0 6px;
+    }
+
+    .weekday.weekend {
+      color: #c74b5e;
+      text-decoration: line-through;
+    }
+
+    .day-cell {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      cursor: pointer;
+      transition: transform .12s ease, background .2s ease, border-color .2s ease;
+      font-size: 14px;
+    }
+
+    .day-cell:hover {
+      transform: translateY(-1px);
+      border-color: #9ec3e8;
+      background: #f5faff;
+    }
+
+    .day-cell.empty {
+      background: #f7fbff;
+      color: #afbece;
+      cursor: default;
+    }
+
+    .day-cell.empty:hover {
+      transform: none;
+      border-color: var(--line);
+      background: #f7fbff;
+    }
+
+    .day-cell.weekend {
+      background: var(--weekend);
+      color: #a74252;
+    }
+
+    .day-cell.today {
+      box-shadow: inset 0 0 0 2px #e8c548;
+      background: var(--today);
+    }
+
+    .day-cell.selected {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      color: #0c4f91;
+      font-weight: 700;
+    }
+
+    .selected-day {
+      margin: 16px 0 8px;
+      font-weight: 600;
+      min-height: 24px;
+    }
+
+    .availability-note {
+      margin: 0 0 12px;
+      color: var(--muted);
+      min-height: 20px;
+      font-size: 14px;
+    }
+
+    .time-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .time-slot {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      padding: 9px 8px;
+      cursor: pointer;
+      transition: all .2s ease;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .time-slot:hover {
+      border-color: #8cb9e6;
+      background: #edf6ff;
+    }
+
+    .time-slot.selected {
+      border-color: var(--accent);
+      background: #eafaf5;
+      color: #0c6b52;
+      font-weight: 700;
+    }
+
+    .book-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: linear-gradient(90deg, #1ea37a, #228cc0);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .15s ease, filter .2s ease;
+    }
+
+    .book-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+    }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <section class="page-card">
+      <h2 class="page-title">Администратор: просмотр расписания врача</h2>
+      <div id="adminScheduler"></div>
+    </section>
+
+    <section class="page-card">
+      <h2 class="page-title">Пользователь: запись к врачу</h2>
+      <div id="userScheduler"></div>
+    </section>
+  </main>
+
+  <script>
+    const MONTHS = [
+      "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+      "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+    ];
+    const WEEKDAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+    const YEARS = [2024, 2025, 2026];
+
+    const WEEKDAY_SLOTS = ["12:00", "13:12", "14:24", "15:36", "16:48", "18:12", "18:36", "18:48", "19:00", "19:12", "19:24", "19:36"];
+    const SATURDAY_SLOTS = ["10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30"];
+
+    function formatLongDate(date) {
+      return new Intl.DateTimeFormat("ru-RU", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }).format(date);
+    }
+
+    function getMondayBasedDay(jsDay) {
+      return jsDay === 0 ? 6 : jsDay - 1;
+    }
+
+    function createDoctorScheduler(targetId, doctorName) {
+      const host = document.getElementById(targetId);
+      if (!host) return;
+
+      const today = new Date();
+      const todayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+
+      const state = {
+        month: today.getMonth(),
+        year: YEARS.includes(today.getFullYear()) ? today.getFullYear() : YEARS[0],
+        selectedDate: null,
+        selectedTime: null
+      };
+
+      host.innerHTML = `
+        <article class="scheduler">
+          <h3 class="doctor-name">${doctorName}</h3>
+          <div class="controls">
+            <button class="arrow-btn" data-action="prev" aria-label="Предыдущий месяц">&lt;</button>
+            <select class="month-select" aria-label="Выбор месяца">
+              ${MONTHS.map((m, i) => `<option value="${i}">${m}</option>`).join("")}
+            </select>
+            <select class="year-select" aria-label="Выбор года">
+              ${YEARS.map(y => `<option value="${y}">${y}</option>`).join("")}
+            </select>
+            <button class="arrow-btn" data-action="next" aria-label="Следующий месяц">&gt;</button>
+          </div>
+
+          <div class="calendar-head">
+            ${WEEKDAYS.map((day, index) => `<div class="weekday ${index > 4 ? "weekend" : ""}">${day}</div>`).join("")}
+          </div>
+          <div class="calendar-grid"></div>
+
+          <p class="selected-day">Выберите дату</p>
+          <p class="availability-note">Выберите дату</p>
+          <div class="time-grid"></div>
+          <div class="book-wrap"></div>
+        </article>
+      `;
+
+      const monthSelect = host.querySelector(".month-select");
+      const yearSelect = host.querySelector(".year-select");
+      const calendarGrid = host.querySelector(".calendar-grid");
+      const selectedDayEl = host.querySelector(".selected-day");
+      const noteEl = host.querySelector(".availability-note");
+      const timeGrid = host.querySelector(".time-grid");
+      const bookWrap = host.querySelector(".book-wrap");
+
+      function buildCalendar() {
+        monthSelect.value = String(state.month);
+        yearSelect.value = String(state.year);
+        calendarGrid.innerHTML = "";
+
+        const firstDay = new Date(state.year, state.month, 1);
+        const daysInMonth = new Date(state.year, state.month + 1, 0).getDate();
+        const startShift = getMondayBasedDay(firstDay.getDay());
+
+        for (let i = 0; i < startShift; i++) {
+          const empty = document.createElement("button");
+          empty.className = "day-cell empty";
+          empty.type = "button";
+          empty.textContent = "";
+          empty.disabled = true;
+          calendarGrid.appendChild(empty);
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          const date = new Date(state.year, state.month, day);
+          const dow = date.getDay();
+          const isSaturday = dow === 6;
+          const isSunday = dow === 0;
+          const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+          const isToday = key === todayKey;
+          const isSelected = state.selectedDate && key === `${state.selectedDate.getFullYear()}-${state.selectedDate.getMonth()}-${state.selectedDate.getDate()}`;
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = `day-cell ${isSaturday || isSunday ? "weekend" : ""} ${isToday ? "today" : ""} ${isSelected ? "selected" : ""}`.trim();
+          btn.textContent = String(day);
+          btn.dataset.day = String(day);
+          btn.addEventListener("click", () => {
+            state.selectedDate = date;
+            state.selectedTime = null;
+            buildCalendar();
+            buildTimes();
+          });
+          calendarGrid.appendChild(btn);
+        }
+
+        const totalCells = startShift + daysInMonth;
+        const tailCells = (7 - (totalCells % 7)) % 7;
+        for (let i = 0; i < tailCells; i++) {
+          const empty = document.createElement("button");
+          empty.className = "day-cell empty";
+          empty.type = "button";
+          empty.textContent = "";
+          empty.disabled = true;
+          calendarGrid.appendChild(empty);
+        }
+      }
+
+      function buildTimes() {
+        timeGrid.innerHTML = "";
+        bookWrap.innerHTML = "";
+
+        if (!state.selectedDate) {
+          selectedDayEl.textContent = "Выберите дату";
+          noteEl.textContent = "Выберите дату";
+          return;
+        }
+
+        const dateLabel = formatLongDate(state.selectedDate);
+        const day = state.selectedDate.getDay();
+
+        selectedDayEl.textContent = `Выбранный день: ${dateLabel}`;
+
+        let slots = [];
+        if (day === 0) {
+          slots = [];
+          noteEl.textContent = "Нет доступного времени (воскресенье)";
+        } else if (day === 6) {
+          slots = SATURDAY_SLOTS;
+          noteEl.textContent = "Суббота: запись ограничена (только утренние часы)";
+        } else {
+          slots = WEEKDAY_SLOTS;
+          noteEl.textContent = "Будний день: стандартное время приема";
+        }
+
+        if (!slots.length) return;
+
+        slots.forEach((time) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = `time-slot ${state.selectedTime === time ? "selected" : ""}`.trim();
+          btn.textContent = time;
+          btn.addEventListener("click", () => {
+            state.selectedTime = time;
+            buildTimes();
+          });
+          timeGrid.appendChild(btn);
+        });
+
+        if (state.selectedTime) {
+          const bookBtn = document.createElement("button");
+          bookBtn.type = "button";
+          bookBtn.className = "book-btn";
+          bookBtn.textContent = `Записаться на ${dateLabel} в ${state.selectedTime}`;
+          bookBtn.addEventListener("click", () => {
+            const message = `Вы записаны к ${doctorName} на ${dateLabel} в ${state.selectedTime}`;
+            console.log(message);
+            alert(message);
+          });
+          bookWrap.appendChild(bookBtn);
+        }
+      }
+
+      host.querySelector(".controls").addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const action = target.dataset.action;
+        if (!action) return;
+
+        if (action === "prev") {
+          if (state.month === 0) {
+            const prevYearIndex = YEARS.indexOf(state.year) - 1;
+            if (prevYearIndex >= 0) {
+              state.year = YEARS[prevYearIndex];
+              state.month = 11;
+            }
+          } else {
+            state.month -= 1;
+          }
+        }
+
+        if (action === "next") {
+          if (state.month === 11) {
+            const nextYearIndex = YEARS.indexOf(state.year) + 1;
+            if (nextYearIndex < YEARS.length) {
+              state.year = YEARS[nextYearIndex];
+              state.month = 0;
+            }
+          } else {
+            state.month += 1;
+          }
+        }
+
+        state.selectedDate = null;
+        state.selectedTime = null;
+        buildCalendar();
+        buildTimes();
+      });
+
+      monthSelect.addEventListener("change", (event) => {
+        state.month = Number(event.target.value);
+        state.selectedDate = null;
+        state.selectedTime = null;
+        buildCalendar();
+        buildTimes();
+      });
+
+      yearSelect.addEventListener("change", (event) => {
+        state.year = Number(event.target.value);
+        state.selectedDate = null;
+        state.selectedTime = null;
+        buildCalendar();
+        buildTimes();
+      });
+
+      buildCalendar();
+      buildTimes();
+    }
+
+    createDoctorScheduler("adminScheduler", "Елена Александровна");
+    createDoctorScheduler("userScheduler", "Сергей Дмитриевич");
+  </script>
+</body>
+</html>

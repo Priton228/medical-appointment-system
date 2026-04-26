@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCrypt Hash Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f4f8;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #002666;
+            margin-bottom: 30px;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #c8d3e6;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #657fad;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #002666;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f4f8;
+            border-radius: 10px;
+            word-break: break-all;
+        }
+        .sql {
+            background: #002666;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 BCrypt Hash Generator</h1>
+        <label for="password"><strong>Введите пароль:</strong></label>
+        <input type="text" id="password" value="admin123" placeholder="Введите пароль...">
+        <button onclick="generateHash()">Сгенерировать BCrypt Hash</button>
+        
+        <div id="result" class="result" style="display: none;">
+            <h3>✅ BCrypt Hash:</h3>
+            <p id="hash"></p>
+            
+            <h3>📝 SQL Query для обновления:</h3>
+            <div id="sql" class="sql"></div>
+        </div>
+    </div>
+
+    <script>
+        function generateHash() {
+            const password = document.getElementById('password').value;
+            if (!password) {
+                alert('Введите пароль!');
+                return;
+            }
+
+            // Generate BCrypt hash with salt rounds = 10
+            const salt = dcodeIO.bcrypt.genSaltSync(10);
+            const hash = dcodeIO.bcrypt.hashSync(password, salt);
+
+            document.getElementById('hash').textContent = hash;
+            
+            const sqlQuery = `-- Выполните этот SQL запрос в PostgreSQL:
+
+UPDATE users 
+SET password_hash = '${hash}'
+WHERE email IN (
+    'admin@medical-system.com',
+    'doctor.petrov@medical-system.com',
+    'doctor.sidorova@medical-system.com',
+    'doctor.ivanova@medical-system.com'
+);
+
+-- Проверка:
+SELECT email, role, LEFT(password_hash, 30) as hash_preview 
+FROM users 
+WHERE role IN ('ADMIN', 'DOCTOR') 
+ORDER BY role, email;`;
+
+            document.getElementById('sql').textContent = sqlQuery;
+            document.getElementById('result').style.display = 'block';
+        }
+
+        // Auto-generate on load
+        window.onload = generateHash;
+    </script>
+</body>
+</html>
