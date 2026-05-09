@@ -7,10 +7,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Build project
+          name: Build and test with coverage
           command: |
             cd medical-appointment-system/backend
-            mvn clean compile
+            mvn clean verify
       - run:
           name: SonarCloud analysis
           command: |
@@ -19,7 +19,7 @@ jobs:
               -Dsonar.projectKey=Priton228_medical-appointment-system \
               -Dsonar.organization=priton228 \
               -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.login=${SONAR_TOKEN}
+              -Dsonar.token=${SONAR_TOKEN}
 
 workflows:
   main:
