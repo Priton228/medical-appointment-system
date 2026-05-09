@@ -105,7 +105,7 @@ class PatientCabinetServiceTest {
         when(slotRepository.save(any(Slot.class))).thenReturn(slot);
         when(appointmentRepository.save(any(Appointment.class))).thenReturn(savedAppointment);
         when(appointmentMapper.toResponse(savedAppointment)).thenReturn(
-                new AppointmentResponse(1000L, null, null, null, null, "SCHEDULED", null, null, null, null, null));
+                new AppointmentResponse(1000L, null, null, null, null, null, null, null, null, AppointmentStatus.SCHEDULED, null, null, null, null, null));
 
         AppointmentResponse response = patientCabinetService.bookAppointment(authentication, request);
 

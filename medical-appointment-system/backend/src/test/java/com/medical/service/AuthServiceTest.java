@@ -233,7 +233,7 @@ class AuthServiceTest {
         authService.resetPassword("ivan@test.com", "123456", "newPass123", "newPass123");
 
         verify(userRepository).save(argThat(u -> u.getPasswordHash().equals("encodedNew")));
-        verify(passwordResetCodeRepository).save(argThat(PasswordResetCode::getUsed));
+        verify(passwordResetCodeRepository).save(argThat(PasswordResetCode::isUsed));
     }
 
     @Test
