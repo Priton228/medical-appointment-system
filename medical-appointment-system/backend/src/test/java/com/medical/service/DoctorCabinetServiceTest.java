@@ -328,7 +328,7 @@ class DoctorCabinetServiceTest {
 
         assertEquals("Dr. Smith", result.get("fullName"));
         assertEquals("Therapy", result.get("specialization"));
-        assertEquals(4.5, result.get("rating"));
+        assertEquals(java.math.BigDecimal.valueOf(4.5), result.get("rating"));
         assertEquals(10, result.get("totalRatings"));
     }
 
