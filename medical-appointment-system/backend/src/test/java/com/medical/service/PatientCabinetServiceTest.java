@@ -198,4 +198,49 @@ class PatientCabinetServiceTest {
 
         assertEquals("APPOINTMENT_TIME_CONFLICT", ex.getErrorCode());
     }
+
+    @Test
+    void getMyAppointments_shouldReturnList() {
+        when(authentication.getName()).thenReturn("patient1");
+        when(patientRepository.findByUserUsername("patient1")).thenReturn(Optional.of(patient));
+        Appointment apt = Appointment.builder().id(1L).patient(patient).doctor(doctor).slot(slot).status(AppointmentStatus.SCHEDULED).build();
+        when(appointmentRepository.findByPatientAndStatusInOrderBySlotDateAscSlotStartTimeAsc(
+                eq(patient), anyList())).thenReturn(List.of(apt));
+        when(appointmentMapper.toResponse(apt)).thenReturn(
+                new AppointmentResponse(1L, 100L, 1L, "Patient", 2L, "Dr. Smith",
+                        LocalDate.of(2025, 6, 1), LocalTime.of(10, 0), LocalTime.of(10, 30),
+                        AppointmentStatus.SCHEDULED, null, null, null, null, null));
+
+        var result = patientCabinetService.getMyAppointments(authentication);
+
+        assertEquals(1, result.size());
+        assertEquals(1L, result.get(0).id());
+    }
+
+    @Test
+    void getMyAppointments_shouldFilterByStatuses() {
+        when(authentication.getName()).thenReturn("patient1");
+        when(patientRepository.findByUserUsername("patient1")).thenReturn(Optional.of(patient));
+        when(appointmentRepository.findByPatientAndStatusInOrderBySlotDateAscSlotStartTimeAsc(
+                eq(patient), anyList())).thenReturn(Collections.emptyList());
+
+        var result = patientCabinetService.getMyAppointments(authentication);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getMyAppointments_shouldIncludeAllRelevantStatuses() {
+        when(authentication.getName()).thenReturn("patient1");
+        when(patientRepository.findByUserUsername("patient1")).thenReturn(Optional.of(patient));
+        when(appointmentRepository.findByPatientAndStatusInOrderBySlotDateAscSlotStartTimeAsc(
+                eq(patient), argThat(list -> list.contains(AppointmentStatus.SCHEDULED)
+                        && list.contains(AppointmentStatus.CONFIRMED)
+                        && list.contains(AppointmentStatus.RESCHEDULED))))
+                .thenReturn(Collections.emptyList());
+
+        var result = patientCabinetService.getMyAppointments(authentication);
+
+        assertNotNull(result);
+    }
 }

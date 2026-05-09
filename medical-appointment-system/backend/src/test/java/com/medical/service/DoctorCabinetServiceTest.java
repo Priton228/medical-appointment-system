@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
@@ -310,5 +311,84 @@ class DoctorCabinetServiceTest {
 
         assertEquals(1, result.size());
         assertEquals(100L, result.get(0).id());
+    }
+
+    @Test
+    void getProfile_shouldReturnMap() {
+        when(authentication.getName()).thenReturn("doc1");
+        when(doctorRepository.findByUserUsername("doc1")).thenReturn(Optional.of(doctor));
+
+        var result = doctorCabinetService.getProfile(authentication);
+
+        assertEquals("Dr. Smith", result.get("fullName"));
+        assertEquals("Therapy", result.get("specialization"));
+        assertEquals(4.5, result.get("rating"));
+        assertEquals(10, result.get("totalRatings"));
+    }
+
+    @Test
+    void getMyPatients_shouldReturnDistinctPatients() {
+        when(authentication.getName()).thenReturn("doc1");
+        when(doctorRepository.findByUserUsername("doc1")).thenReturn(Optional.of(doctor));
+        User pu = User.builder().id(5L).fullName("Patient A").email("pa@test.com").phone("111").build();
+        Patient pat = Patient.builder().id(5L).user(pu).dateOfBirth(java.time.LocalDate.of(1990, 1, 1)).build();
+        Appointment apt = Appointment.builder().id(1L).patient(pat).doctor(doctor).build();
+        when(appointmentRepository.findByDoctorOrderBySlotDateDescSlotStartTimeDesc(doctor)).thenReturn(List.of(apt));
+
+        var result = doctorCabinetService.getMyPatients(authentication);
+
+        assertEquals(1, result.size());
+        assertEquals("Patient A", result.get(0).get("fullName"));
+    }
+
+    @Test
+    void getNotifications_shouldReturnList() {
+        when(authentication.getName()).thenReturn("doc1");
+        when(doctorRepository.findByUserUsername("doc1")).thenReturn(Optional.of(doctor));
+        UserNotification notif = UserNotification.builder()
+                .id(1L)
+                .user(doctorUser)
+                .type(com.medical.entity.NotificationType.APPOINTMENT_CONFIRMED)
+                .title("Test")
+                .message("Msg")
+                .isRead(false)
+                .createdAt(java.time.LocalDateTime.now())
+                .build();
+        when(userNotificationRepository.findByUserOrderByCreatedAtDesc(doctorUser)).thenReturn(List.of(notif));
+
+        var result = doctorCabinetService.getNotifications(authentication);
+
+        assertEquals(1, result.size());
+        assertEquals("Test", result.get(0).get("title"));
+    }
+
+    @Test
+    void setNotificationRead_shouldUpdateStatus() {
+        when(authentication.getName()).thenReturn("doc1");
+        when(doctorRepository.findByUserUsername("doc1")).thenReturn(Optional.of(doctor));
+        UserNotification notif = UserNotification.builder()
+                .id(1L)
+                .user(doctorUser)
+                .isRead(false)
+                .createdAt(java.time.LocalDateTime.now())
+                .build();
+        when(userNotificationRepository.findById(1L)).thenReturn(Optional.of(notif));
+        when(userNotificationRepository.save(any(UserNotification.class))).thenReturn(notif);
+
+        var result = doctorCabinetService.setNotificationRead(authentication, 1L, true);
+
+        assertEquals(true, result.get("isRead"));
+    }
+
+    @Test
+    void deleteNotification_shouldSucceed() {
+        when(authentication.getName()).thenReturn("doc1");
+        when(doctorRepository.findByUserUsername("doc1")).thenReturn(Optional.of(doctor));
+        UserNotification notif = UserNotification.builder().id(1L).user(doctorUser).build();
+        when(userNotificationRepository.findById(1L)).thenReturn(Optional.of(notif));
+        doNothing().when(userNotificationRepository).delete(notif);
+
+        assertDoesNotThrow(() -> doctorCabinetService.deleteNotification(authentication, 1L));
+        verify(userNotificationRepository).delete(notif);
     }
 }

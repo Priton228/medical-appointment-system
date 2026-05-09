@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -170,5 +171,64 @@ class AdminCabinetServiceTest {
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> adminCabinetService.setUserBlocked(99L, true));
         assertEquals("USER_NOT_FOUND", ex.getErrorCode());
+    }
+
+    @Test
+    void getDashboard_shouldReturnZero_whenEmpty() {
+        when(userRepository.count()).thenReturn(0L);
+        when(userRepository.countByRole(Role.DOCTOR)).thenReturn(0L);
+        when(userRepository.countByRole(Role.PATIENT)).thenReturn(0L);
+        when(appointmentRepository.count()).thenReturn(0L);
+        when(appointmentRepository.countByStatus(AppointmentStatus.SCHEDULED)).thenReturn(0L);
+        when(appointmentRepository.countByStatus(AppointmentStatus.COMPLETED)).thenReturn(0L);
+
+        var response = adminCabinetService.getDashboard();
+
+        assertEquals(0L, response.totalUsers());
+        assertEquals(0L, response.totalDoctors());
+        assertEquals(0L, response.totalPatients());
+    }
+
+    @Test
+    void getDoctors_shouldReturnList() {
+        Specialization spec = Specialization.builder().id(1L).name("Therapy").build();
+        User du = User.builder().id(3L).fullName("Dr. One").username("dr1").email("d1@test.com").phone("111").role(Role.DOCTOR).isBlocked(false).build();
+        Doctor doc = Doctor.builder().id(1L).user(du).specialization(spec).description("Desc").experienceYears(5).education("Edu").rating(java.math.BigDecimal.valueOf(4.5)).totalRatings(10).build();
+        when(doctorRepository.findAll()).thenReturn(List.of(doc));
+
+        var result = adminCabinetService.getDoctors();
+
+        assertEquals(1, result.size());
+        assertEquals("Dr. One", result.get(0).fullName());
+    }
+
+    @Test
+    void getAllPatients_shouldReturnList() {
+        Patient pat = Patient.builder().id(1L).user(patientUser).dateOfBirth(java.time.LocalDate.of(1990, 1, 1)).build();
+        when(patientRepository.findAll()).thenReturn(List.of(pat));
+
+        var result = adminCabinetService.getAllPatients();
+
+        assertEquals(1, result.size());
+        assertEquals("Patient One", result.get(0).get("fullName"));
+    }
+
+    @Test
+    void getPatientById_shouldReturnDetail() {
+        Patient pat = Patient.builder().id(2L).user(patientUser).heightCm(180).weightKg(75).bloodType("O+").allergies("None").chronicDiseases("None").build();
+        when(patientRepository.findById(2L)).thenReturn(Optional.of(pat));
+
+        var result = adminCabinetService.getPatientById(2L);
+
+        assertEquals("Patient One", result.get("fullName"));
+        assertEquals(180, result.get("heightCm"));
+    }
+
+    @Test
+    void getPatientById_shouldThrow_whenNotFound() {
+        when(patientRepository.findById(99L)).thenReturn(Optional.empty());
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> adminCabinetService.getPatientById(99L));
+        assertEquals("PATIENT_NOT_FOUND", ex.getErrorCode());
     }
 }
