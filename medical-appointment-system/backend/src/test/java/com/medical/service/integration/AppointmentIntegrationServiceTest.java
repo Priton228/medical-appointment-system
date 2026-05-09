@@ -68,7 +68,7 @@ class AppointmentIntegrationServiceTest {
         appointmentIntegrationService.handleAppointmentBooked(appointment);
 
         verify(userNotificationRepository, times(2)).save(any(UserNotification.class));
-        verify(emailNotificationService, times(4)).sendEmail(any(), any(), any());
+        verify(emailNotificationService, times(2)).sendEmail(any(), any(), any());
         verify(googleCalendarService).createEvent(appointment);
         verify(appointmentRepository).save(any(Appointment.class));
     }

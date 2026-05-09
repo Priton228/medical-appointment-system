@@ -204,8 +204,8 @@ class PatientCabinetServiceTest {
         when(authentication.getName()).thenReturn("patient1");
         when(patientRepository.findByUserUsername("patient1")).thenReturn(Optional.of(patient));
         Appointment apt = Appointment.builder().id(1L).patient(patient).doctor(doctor).slot(slot).status(AppointmentStatus.SCHEDULED).build();
-        when(appointmentRepository.findByPatientAndStatusInOrderBySlotDateAscSlotStartTimeAsc(
-                eq(patient), anyList())).thenReturn(List.of(apt));
+        when(appointmentRepository.findByPatientOrderBySlotDateDescSlotStartTimeDesc(patient))
+                .thenReturn(List.of(apt));
         when(appointmentMapper.toResponse(apt)).thenReturn(
                 new AppointmentResponse(1L, 100L, 1L, "Patient", 2L, "Dr. Smith",
                         LocalDate.of(2025, 6, 1), LocalTime.of(10, 0), LocalTime.of(10, 30),

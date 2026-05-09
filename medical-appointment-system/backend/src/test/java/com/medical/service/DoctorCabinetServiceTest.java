@@ -315,8 +315,14 @@ class DoctorCabinetServiceTest {
 
     @Test
     void getProfile_shouldReturnMap() {
+        Specialization spec = Specialization.builder().id(1L).name("Therapy").build();
+        User user = User.builder().id(1L).username("doc1").fullName("Dr. Smith").email("dr@test.com").phone("+375111").build();
+        Doctor doc = Doctor.builder()
+                .id(1L).user(user).specialization(spec)
+                .description("Desc").experienceYears(5).education("Edu")
+                .rating(java.math.BigDecimal.valueOf(4.5)).totalRatings(10).build();
         when(authentication.getName()).thenReturn("doc1");
-        when(doctorRepository.findByUserUsername("doc1")).thenReturn(Optional.of(doctor));
+        when(doctorRepository.findByUserUsername("doc1")).thenReturn(Optional.of(doc));
 
         var result = doctorCabinetService.getProfile(authentication);
 
@@ -369,6 +375,9 @@ class DoctorCabinetServiceTest {
         UserNotification notif = UserNotification.builder()
                 .id(1L)
                 .user(doctorUser)
+                .type(com.medical.entity.NotificationType.APPOINTMENT_CONFIRMED)
+                .title("Test")
+                .message("Msg")
                 .isRead(false)
                 .createdAt(java.time.LocalDateTime.now())
                 .build();
