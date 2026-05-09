@@ -211,36 +211,22 @@ class PatientCabinetServiceTest {
                         LocalDate.of(2025, 6, 1), LocalTime.of(10, 0), LocalTime.of(10, 30),
                         AppointmentStatus.SCHEDULED, null, null, null, null, null));
 
-        var result = patientCabinetService.getMyAppointments(authentication);
+        var result = patientCabinetService.getAppointments(authentication);
 
         assertEquals(1, result.size());
         assertEquals(1L, result.get(0).id());
     }
 
     @Test
-    void getMyAppointments_shouldFilterByStatuses() {
+    void getAppointments_shouldReturnEmptyList() {
         when(authentication.getName()).thenReturn("patient1");
         when(patientRepository.findByUserUsername("patient1")).thenReturn(Optional.of(patient));
-        when(appointmentRepository.findByPatientAndStatusInOrderBySlotDateAscSlotStartTimeAsc(
-                eq(patient), anyList())).thenReturn(Collections.emptyList());
+        when(appointmentRepository.findByPatientOrderBySlotDateDescSlotStartTimeDesc(patient))
+                .thenReturn(Collections.emptyList());
 
-        var result = patientCabinetService.getMyAppointments(authentication);
+        var result = patientCabinetService.getAppointments(authentication);
 
         assertTrue(result.isEmpty());
     }
 
-    @Test
-    void getMyAppointments_shouldIncludeAllRelevantStatuses() {
-        when(authentication.getName()).thenReturn("patient1");
-        when(patientRepository.findByUserUsername("patient1")).thenReturn(Optional.of(patient));
-        when(appointmentRepository.findByPatientAndStatusInOrderBySlotDateAscSlotStartTimeAsc(
-                eq(patient), argThat(list -> list.contains(AppointmentStatus.SCHEDULED)
-                        && list.contains(AppointmentStatus.CONFIRMED)
-                        && list.contains(AppointmentStatus.RESCHEDULED))))
-                .thenReturn(Collections.emptyList());
-
-        var result = patientCabinetService.getMyAppointments(authentication);
-
-        assertNotNull(result);
-    }
 }
