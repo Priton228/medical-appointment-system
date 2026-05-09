@@ -1,0 +1,28 @@
+version: 2.1
+
+jobs:
+  build-and-analyze:
+    docker:
+      - image: cimg/openjdk:21.0
+    steps:
+      - checkout
+      - run:
+          name: Build project
+          command: |
+            cd medical-appointment-system/backend
+            mvn clean compile
+      - run:
+          name: SonarCloud analysis
+          command: |
+            cd medical-appointment-system/backend
+            mvn sonar:sonar \
+              -Dsonar.projectKey=Priton228_medical-appointment-system \
+              -Dsonar.organization=priton228 \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.login=${SONAR_TOKEN}
+
+workflows:
+  main:
+    jobs:
+      - build-and-analyze:
+          context: SonarCloud
