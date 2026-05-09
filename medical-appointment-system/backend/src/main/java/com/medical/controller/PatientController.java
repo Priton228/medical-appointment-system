@@ -6,6 +6,7 @@ import com.medical.dto.common.SlotResponse;
 import com.medical.dto.common.SymptomResponse;
 import com.medical.dto.patient.*;
 import com.medical.service.PatientCabinetService;
+import com.medical.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,9 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/patient")
@@ -24,6 +27,7 @@ import java.util.List;
 public class PatientController {
 
     private final PatientCabinetService patientCabinetService;
+    private final ReviewService reviewService;
 
     @GetMapping("/dashboard")
     public ResponseEntity<PatientDashboardResponse> getDashboard(Authentication authentication) {
@@ -41,6 +45,14 @@ public class PatientController {
             @Valid @RequestBody UpdatePatientProfileRequest request
     ) {
         return ResponseEntity.ok(patientCabinetService.updateProfile(authentication, request));
+    }
+
+    @PostMapping("/profile/avatar")
+    public ResponseEntity<PatientProfileResponse> uploadAvatar(
+            Authentication authentication,
+            @RequestBody Map<String, String> request
+    ) {
+        return ResponseEntity.ok(patientCabinetService.uploadAvatar(authentication, request.get("avatarUrl")));
     }
 
     @GetMapping("/doctors")
@@ -75,6 +87,11 @@ public class PatientController {
     @PatchMapping("/appointments/{appointmentId}/cancel")
     public ResponseEntity<AppointmentResponse> cancelAppointment(Authentication authentication, @PathVariable Long appointmentId) {
         return ResponseEntity.ok(patientCabinetService.cancelAppointment(authentication, appointmentId));
+    }
+
+    @PatchMapping("/appointments/{appointmentId}/confirm")
+    public ResponseEntity<AppointmentResponse> confirmAppointment(Authentication authentication, @PathVariable Long appointmentId) {
+        return ResponseEntity.ok(patientCabinetService.confirmAppointment(authentication, appointmentId));
     }
 
     @GetMapping("/medical-records")
@@ -125,5 +142,24 @@ public class PatientController {
     public ResponseEntity<Void> changePassword(Authentication authentication, @Valid @RequestBody ChangePasswordRequest request) {
         patientCabinetService.changePassword(authentication, request);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reviews")
+    public ResponseEntity<ReviewResponse> createReview(
+            Authentication authentication,
+            @Valid @RequestBody CreateReviewRequest request
+    ) {
+        Long patientId = patientCabinetService.getPatientId(authentication);
+        return ResponseEntity.ok(reviewService.createReview(patientId, request));
+    }
+
+    @GetMapping("/reviews/appointment/{appointmentId}")
+    public ResponseEntity<ReviewResponse> getReviewByAppointmentId(@PathVariable Long appointmentId) {
+        return ResponseEntity.ok(reviewService.getReviewByAppointmentId(appointmentId));
+    }
+
+    @GetMapping("/doctors/{doctorId}/reviews")
+    public ResponseEntity<List<ReviewResponse>> getDoctorReviews(@PathVariable Long doctorId) {
+        return ResponseEntity.ok(reviewService.getReviewsByDoctorId(doctorId));
     }
 }

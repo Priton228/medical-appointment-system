@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* ========================================
    МЕДИЦИНСКИЙ СЕРВИС - ПРЕМИАЛЬНЫЙ ДИЗАЙН
@@ -7,19 +8,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 @theme {
-  /* Палитра от пользователя: Blues & Minimal Red Accent */
+  /* === СВЕТЛАЯ ТЕМА (по умолчанию) === */
   --color-brand-primary: #657fad;    /* Medium Blue - Shadows, primary icons */
   --color-brand-secondary: #002666;  /* Dark Blue - Headers, main buttons, DARK background */
   --color-brand-soft: #c8d3e6;       /* Light Blue - Secondary elements, LIGHT background */
   --color-brand-accent: #ad0000;     /* Red - Minimal accent */
   --color-brand-bg: #f0f4f8;         /* Very Light Blue - Main background */
-  
+
   --color-brand-on-dark: #ffffff;    /* Текст на темном фоне - ВСЕГДА БЕЛЫЙ */
   --color-brand-on-light: #002666;   /* Текст на светлом фоне - ВСЕГДА ТЕМНО-СИНИЙ */
-  
+
   --color-surface-card: #ffffff;
   --color-surface-bg: #f0f4f8;
   --color-surface-dark: #002666;
+
+  /* === ТЁМНАЯ ТЕМА (инвертированные цвета) === */
+  --color-dark-bg: #0f172a;          /* Тёмный фон - slate-900 */
+  --color-dark-surface: #1e293b;     /* Тёмные карточки - slate-800 */
+  --color-dark-surface-hover: #334155; /* slate-700 */
+  --color-dark-border: rgba(101, 127, 173, 0.3); /* Границы в тёмной теме */
+  --color-dark-text-primary: #f8fafc; /* Основной текст - slate-50 */
+  --color-dark-text-secondary: #cbd5e1; /* Вторичный текст - slate-300 */
+  --color-dark-text-muted: #94a3b8;  /* Приглушённый текст - slate-400 */
 
   --color-status-success: #10B981;
   --color-status-warning: #F59E0B;
@@ -34,7 +44,9 @@
 
   --shadow-premium: 0 10px 40px -10px rgba(101, 127, 173, 0.2), 0 5px 20px -5px rgba(0, 38, 102, 0.1);
   --shadow-hover: 0 20px 50px -12px rgba(101, 127, 173, 0.3), 0 10px 20px -8px rgba(0, 38, 102, 0.15);
-  
+  --shadow-premium-dark: 0 10px 40px -10px rgba(0, 0, 0, 0.5), 0 5px 20px -5px rgba(0, 0, 0, 0.3);
+  --shadow-hover-dark: 0 20px 50px -12px rgba(0, 0, 0, 0.6), 0 10px 20px -8px rgba(0, 0, 0, 0.4);
+
   --animate-fade-up: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   --animate-scale-in: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   --animate-float: float 6s ease-in-out infinite;
@@ -86,7 +98,7 @@
   --accent: #ad0000;
   --bg-main: #f0f4f8;
   --text-main: #002666;
-  
+
   --radius-lg: 20px;
   --radius-xl: 32px;
 }
@@ -124,9 +136,9 @@ p, span, label, input {
 
 body {
   background-color: var(--bg-main);
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(0, 102, 255, 0.03) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(0, 240, 255, 0.03) 0px, transparent 50%);
+  background-image:
+          radial-gradient(at 0% 0%, rgba(0, 102, 255, 0.03) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, rgba(0, 240, 255, 0.03) 0px, transparent 50%);
   color: var(--text-main);
   font-family: 'Plus Jakarta Sans', sans-serif;
   min-height: 100vh;
@@ -145,4 +157,438 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
+}
+
+/* ========================================
+   ТЁМНАЯ ТЕМА - DARK MODE
+   ======================================== */
+
+/* Когда на html есть класс .dark - применяем тёмную тему */
+.dark {
+  /* Переопределяем CSS переменные для тёмной темы */
+  --color-brand-bg: #0f172a;
+  --color-surface-card: #1e293b;
+  --color-surface-bg: #0f172a;
+  --color-brand-soft: rgba(101, 127, 173, 0.3);
+
+  /* Инвертируем цвета текста */
+  --color-brand-on-light: #f8fafc;  /* Тёмный текст становится светлым */
+}
+
+/* Фон и текст body в тёмной теме */
+.dark body {
+  background-color: #0f172a;
+  background-image:
+          radial-gradient(at 0% 0%, rgba(101, 127, 173, 0.08) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, rgba(0, 102, 255, 0.05) 0px, transparent 50%);
+  color: #f8fafc;
+}
+
+/* Все карточки в тёмной теме - тёмные с белым текстом */
+.dark .premium-card,
+.dark .glass-card {
+  background: #1e293b !important;
+  border-color: rgba(101, 127, 173, 0.3) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5), 0 5px 20px -5px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .premium-card:hover {
+  background: #334155 !important;
+  border-color: #657fad !important;
+}
+
+
+/* Заголовки в тёмной теме */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: #f8fafc;
+}
+
+/* Основной текст в тёмной теме */
+.dark p, .dark span, .dark label, .dark div {
+  color: inherit;
+}
+
+/* Инпуты в тёмной теме */
+.dark input,
+.dark select,
+.dark textarea {
+  background: #1e293b !important;
+  border-color: rgba(101, 127, 173, 0.4) !important;
+  color: #f8fafc !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: #657fad !important;
+  outline: none;
+}
+
+/* Кнопки в тёмной теме */
+.dark button:not(.bg-brand-secondary):not(.bg-brand-primary):not(.bg-brand-accent) {
+  background: #1e293b;
+  border-color: rgba(101, 127, 173, 0.4);
+  color: #f8fafc;
+}
+
+.dark button:hover:not(.bg-brand-secondary):not(.bg-brand-primary):not(.bg-brand-accent) {
+  background: #334155;
+  border-color: #657fad;
+}
+
+/* Ссылки в тёмной теме */
+.dark a {
+  color: #94c1f7;
+}
+
+.dark a:hover {
+  color: #bfdbfe;
+}
+
+/* Scrollbar в тёмной теме */
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #657fad;
+}
+
+/* Модальные окна и оверлеи в тёмной теме */
+.dark .fixed.inset-0.bg-black\/40,
+.dark .fixed.inset-0.bg-black\/50,
+.dark .fixed.inset-0.bg-black\/60 {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Текст с классами brand-secondary в тёмной теме становится светлым */
+.dark .text-brand-secondary {
+  color: #f8fafc !important;
+}
+
+/* Текст brand-primary в тёмной теме - более светлый */
+.dark .text-brand-primary {
+  color: #94c1f7 !important;
+}
+
+/* Фон brand-bg в тёмной теме */
+.dark .bg-brand-bg {
+  background-color: #0f172a !important;
+}
+
+/* Белые карточки в тёмной теме */
+.dark .bg-white {
+  background-color: #1e293b !important;
+}
+
+/* Границы в тёмной теме */
+.dark .border-brand-soft {
+  border-color: rgba(101, 127, 173, 0.3) !important;
+}
+
+.dark .border-gray-200,
+.dark .border-gray-300 {
+  border-color: rgba(101, 127, 173, 0.3) !important;
+}
+
+/* Сайдбар в тёмной теме */
+.dark aside {
+  background: #1e293b !important;
+}
+
+.dark aside .bg-white {
+  background: #1e293b !important;
+}
+
+.dark aside [class*="bg-brand-soft"] {
+  background: rgba(101, 127, 173, 0.15) !important;
+}
+
+/* Активные элементы навигации в тёмной теме */
+.dark nav a.bg-brand-secondary,
+.dark nav button.bg-brand-secondary {
+  background: #657fad !important;
+}
+
+/* Табы в тёмной теме */
+.dark .border-2.bg-white {
+  background: #1e293b !important;
+}
+
+.dark .border-2.border-brand-soft {
+  border-color: rgba(101, 127, 173, 0.4) !important;
+}
+
+/* Статусы в тёмной теме - делаем ярче для контраста */
+.dark .text-status-success {
+  color: #34d399 !important;
+}
+
+.dark .text-status-error {
+  color: #f87171 !important;
+}
+
+.dark .text-status-warning {
+  color: #fbbf24 !important;
+}
+
+/* Мягкие фоны в тёмной теме */
+.dark [class*="bg-brand-soft/20"],
+.dark [class*="bg-brand-soft/10"],
+.dark [class*="bg-brand-soft/40"] {
+  background: rgba(101, 127, 173, 0.15) !important;
+}
+
+/* Dropdown/Select опции в тёмной теме */
+.dark option {
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+/* ========================================
+   TOAST УВЕДОМЛЕНИЯ - react-hot-toast
+   ======================================== */
+
+/* Тёмная тема для toast */
+.dark [role="status"],
+.dark .go2072408551,
+.dark [class*="toast"] {
+  background: #1e293b !important;
+  border: 2px solid rgba(101, 127, 173, 0.4) !important;
+  color: #f8fafc !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5), 0 5px 20px -5px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Стили для разных типов toast в тёмной теме */
+.dark [role="status"][data-type="success"],
+.dark [class*="toast-success"] {
+  background: #064e3b !important;
+  border-color: #10b981 !important;
+}
+
+.dark [role="status"][data-type="error"],
+.dark [class*="toast-error"] {
+  background: #450a0a !important;
+  border-color: #f87171 !important;
+}
+
+.dark [role="status"][data-type="loading"],
+.dark [class*="toast-loading"] {
+  background: #1e293b !important;
+  border-color: #657fad !important;
+}
+
+/* Исправление острых углов в навигации */
+.dark nav a,
+.dark nav button,
+.dark aside nav a,
+.dark aside nav button,
+.dark aside a,
+.dark aside button,
+.dark aside > div,
+.dark aside nav,
+.dark aside > div > nav {
+  border-radius: 16px !important;
+}
+
+/* Сайдбар полностью */
+.dark aside,
+.dark aside > div:first-child {
+  border-radius: 16px !important;
+  overflow: hidden !important;
+}
+
+/* Все дочерние элементы aside не должны выходить за границы */
+.dark aside > div {
+  overflow: hidden !important;
+  border-radius: 16px !important;
+}
+
+/* Главный контейнер toast в тёмной теме */
+.dark .go4109123758,
+.dark [class*="Toaster"] {
+  --toast-background: #1e293b !important;
+  --toast-border-radius: 16px !important;
+}
+
+/* Иконки в toast в тёмной теме */
+.dark [role="status"] svg {
+  color: #f8fafc !important;
+}
+
+/* ========================================
+   ЦВЕТНЫЕ ПЛАЖКИ СТАТУСОВ В ТЁМНОЙ ТЕМЕ
+   ======================================== */
+
+/* Светлые цветные фоны становятся тёмными в тёмной теме */
+.dark .bg-green-100 {
+  background-color: #064e3b !important;
+}
+
+.dark .bg-red-100 {
+  background-color: #450a0a !important;
+}
+
+.dark .bg-blue-100 {
+  background-color: #1e3a8a !important;
+}
+
+.dark .bg-amber-100 {
+  background-color: #78350f !important;
+}
+
+.dark .bg-emerald-100 {
+  background-color: #064e3b !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: #374151 !important;
+}
+
+.dark .bg-yellow-100 {
+  background-color: #713f12 !important;
+}
+
+/* Полупрозрачные фоны для иконок статистики */
+.dark .bg-brand-primary\/10 {
+  background-color: rgba(101, 127, 173, 0.3) !important;
+}
+
+.dark .bg-brand-accent\/10 {
+  background-color: rgba(56, 189, 248, 0.25) !important;
+}
+
+.dark .bg-brand-secondary\/10 {
+  background-color: rgba(30, 58, 138, 0.4) !important;
+}
+
+/* Плажки статусов (bg-white внутри которых текст) - делаем темнее */
+.dark span.bg-white.rounded-full,
+.dark span.bg-white.rounded-lg,
+.dark span.bg-white.rounded-xl {
+  background-color: #334155 !important;
+}
+
+/* Текст для ИМТ блока в тёмной теме */
+.dark .text-blue-600 {
+  color: #93c5fd !important;
+}
+
+.dark .text-green-600 {
+  color: #86efac !important;
+}
+
+.dark .text-yellow-600 {
+  color: #fde047 !important;
+}
+
+.dark .text-red-600 {
+  color: #fca5a5 !important;
+}
+
+/* Дополнительные стили для текста внутри ИМТ блока */
+.dark .text-blue-700 {
+  color: #93c5fd !important;
+}
+
+.dark .text-green-700 {
+  color: #86efac !important;
+}
+
+.dark .text-orange-700 {
+  color: #fdba74 !important;
+}
+
+.dark .text-orange-600 {
+  color: #fb923c !important;
+}
+
+.dark .text-yellow-700 {
+  color: #fde047 !important;
+}
+
+/* Цвета текста на цветных фонах в тёмной теме - делаем светлее */
+.dark .text-blue-600 {
+  color: #60a5fa !important;
+}
+
+.dark .text-emerald-600 {
+  color: #34d399 !important;
+}
+
+.dark .text-green-600 {
+  color: #4ade80 !important;
+}
+
+.dark .text-amber-600 {
+  color: #fbbf24 !important;
+}
+
+.dark .text-red-600 {
+  color: #f87171 !important;
+}
+
+.dark .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+.dark .text-yellow-600 {
+  color: #facc15 !important;
+}
+
+/* Полупрозрачные фоны для статусов */
+.dark .bg-status-success\/10 {
+  background-color: rgba(52, 211, 153, 0.2) !important;
+}
+
+.dark .bg-status-error\/10 {
+  background-color: rgba(248, 113, 113, 0.2) !important;
+}
+
+.dark .bg-status-warning\/10 {
+  background-color: rgba(251, 191, 36, 0.2) !important;
+}
+
+/* Явная светлая тема: модалки и карточки не должны наследовать тёмные bg-white/dark:bg-* */
+.light .fixed.inset-0 > .bg-white,
+.light .fixed.inset-0 .bg-white,
+.light .fixed.inset-0 [class*="dark:bg-gray"] {
+  background-color: #ffffff !important;
+}
+
+.light .fixed.inset-0 .text-brand-secondary,
+.light .fixed.inset-0 .text-brand-primary {
+  color: #002666 !important;
+}
+
+.light .fixed.inset-0 .border-brand-soft {
+  border-color: #c8d3e6 !important;
+}
+
+.light .premium-card,
+.light .glass-card,
+.light .bg-white,
+.light [class*="dark:bg-gray"] {
+  background-color: #ffffff !important;
+}
+
+.light .text-brand-secondary {
+  color: #002666 !important;
+}
+
+.light .text-brand-primary {
+  color: #657fad !important;
+}
+
+.light textarea,
+.light input,
+.light select {
+  color-scheme: light;
 }

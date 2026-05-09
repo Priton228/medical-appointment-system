@@ -5,9 +5,11 @@ import com.medical.entity.Role;
 public record UserResponse(
         Long id,
         String fullName,
+        String username,
         String email,
         String phone,
         Role role,
-        Boolean isBlocked
+        Boolean isBlocked,
+        String avatarUrl
 ) {
 }

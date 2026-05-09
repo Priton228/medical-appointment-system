@@ -7,6 +7,7 @@ public record AuthResponse(
         Long expiresIn,
         String role,
         Long userId,
+        String username,
         String fullName
 ) {
 }

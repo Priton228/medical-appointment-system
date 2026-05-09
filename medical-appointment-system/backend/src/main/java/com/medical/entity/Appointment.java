@@ -5,6 +5,8 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "appointments")
@@ -39,6 +41,15 @@ public class Appointment {
     @Column(name = "symptoms_description", length = 1000)
     private String symptomsDescription;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "appointment_reported_symptoms",
+            joinColumns = @JoinColumn(name = "appointment_id"),
+            inverseJoinColumns = @JoinColumn(name = "symptom_id")
+    )
+    @Builder.Default
+    private Set<Symptom> reportedSymptoms = new HashSet<>();
+
     /** Показания / объективный статус (заполняет врач при завершении приёма) */
     @Column(name = "doctor_notes", length = 2000)
     private String doctorNotes;
@@ -66,4 +77,10 @@ public class Appointment {
 
     @Column(length = 500)
     private String review;
+
+    @Column(name = "calendar_event_id")
+    private String calendarEventId;
+
+    @Column(name = "reminder_sent_at")
+    private LocalDateTime reminderSentAt;
 }

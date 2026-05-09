@@ -4,9 +4,11 @@ import com.medical.entity.AppointmentStatus;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 public record AppointmentResponse(
         Long id,
+        Long slotId,
         Long patientId,
         String patientName,
         Long doctorId,
@@ -18,5 +20,10 @@ public record AppointmentResponse(
         String symptomsDescription,
         String doctorNotes,
         String diagnosis,
-        String treatmentRecommendations) {
+        String treatmentRecommendations,
+        List<SymptomResponse> reportedSymptoms) {
+
+    public AppointmentResponse {
+        reportedSymptoms = reportedSymptoms == null ? List.of() : List.copyOf(reportedSymptoms);
+    }
 }

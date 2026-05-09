@@ -1,14 +1,14 @@
 package com.medical.dto;
 
-import jakarta.validation.constraints.Email;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.NotBlank;
 
 public record LoginRequest(
-        @NotBlank(message = "Email обязателен")
-        @Email(message = "Некорректный формат email")
-        String email,
+        @NotBlank(message = "Login is required")
+        @JsonAlias("email")
+        String username,
 
-        @NotBlank(message = "Пароль обязателен")
+        @NotBlank(message = "Password is required")
         String password
 ) {
 }

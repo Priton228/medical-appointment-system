@@ -19,6 +19,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, length = 50)
+    private String username;
+
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -30,6 +33,9 @@ public class User {
 
     @Column(length = 20)
     private String phone;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

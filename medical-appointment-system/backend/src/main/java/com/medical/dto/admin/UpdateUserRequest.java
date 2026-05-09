@@ -1,16 +1,19 @@
 package com.medical.dto.admin;
 
+import com.medical.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import com.medical.entity.Role;
+import jakarta.validation.constraints.Pattern;
 
 public record UpdateUserRequest(
-        @NotBlank(message = "ФИО обязательно")
+        @NotBlank(message = "Full name is required")
         String fullName,
-        @NotBlank(message = "Email обязателен")
-        @Email(message = "Некорректный email")
+        @Pattern(regexp = "^[a-zA-Z0-9._-]{3,50}$", message = "Username must contain 3-50 latin characters, digits, dot, underscore or dash")
+        String username,
+        @NotBlank(message = "Email is required")
+        @Email(message = "Invalid email")
         String email,
-        @NotBlank(message = "Телефон обязателен")
+        @NotBlank(message = "Phone is required")
         String phone,
         Role role
 ) {

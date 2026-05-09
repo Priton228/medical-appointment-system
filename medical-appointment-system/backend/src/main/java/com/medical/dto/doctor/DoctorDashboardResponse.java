@@ -4,6 +4,8 @@ public record DoctorDashboardResponse(
         long appointmentsToday,
         long totalAppointments,
         long completedAppointments,
-        long activeSlots
+        long activeSlots,
+        Double rating,
+        Integer totalRatings
 ) {
 }

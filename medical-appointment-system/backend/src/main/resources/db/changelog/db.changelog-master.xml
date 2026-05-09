@@ -16,5 +16,8 @@
 
     <!-- Initial data: Admin and Doctor users -->
     <include file="db/changelog/db.changelog-v1-initial-data.xml"/>
+    <include file="db/changelog/db.changelog-v2-usernames.xml"/>
+    <include file="db/changelog/db.changelog-v3-notifications.xml"/>
+    <include file="db/changelog/db.changelog-v4-notification-types.xml"/>
 
 </databaseChangeLog>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="7" author="medical-system">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql"/>
+        </preConditions>
+        <sql>
+            ALTER TABLE user_notifications DROP CONSTRAINT IF EXISTS user_notifications_type_check;
+            ALTER TABLE user_notifications ADD CONSTRAINT user_notifications_type_check
+                CHECK (type IN (
+                    'APPOINTMENT_REMINDER', 'APPOINTMENT_CONFIRMED', 'APPOINTMENT_CANCELLED',
+                    'APPOINTMENT_RESCHEDULED', 'APPOINTMENT_COMPLETED', 'SYSTEM_NOTIFICATION',
+                    'MASS_NOTIFICATION', 'RESCHEDULE_REQUEST_PENDING', 'RESCHEDULE_REQUEST_APPROVED',
+                    'RESCHEDULE_REQUEST_REJECTED', 'REVIEW_RECEIVED'));
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

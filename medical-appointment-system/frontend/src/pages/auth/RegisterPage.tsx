@@ -2,9 +2,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Phone, Lock, ArrowRight, ShieldCheck, Stethoscope } from 'lucide-react';
+import { User, Mail, Phone, Lock, ArrowRight, Sun, Moon } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
+import { useThemeStore } from '../../stores/themeStore';
 import toast from 'react-hot-toast';
+import AuthCat from '../../components/auth/AuthCat';
+import { useState } from 'react';
 
 const registerSchema = z.object({
   fullName: z.string().min(2, 'Введите полное имя'),
@@ -22,7 +25,9 @@ type RegisterForm = z.infer<typeof registerSchema>;
 const RegisterPage = () => {
   const registerUser = useAuthStore((state) => state.register);
   const isLoading = useAuthStore((state) => state.isLoading);
+  const { isDarkMode, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
+  const [focusedField, setFocusedField] = useState<'text' | 'password' | null>(null);
 
   const {
     register: registerField,
@@ -46,35 +51,23 @@ const RegisterPage = () => {
     <div className="min-h-[calc(100vh-90px)] flex items-center justify-center p-6 -mt-10 bg-brand-bg">
       <div className="flex flex-col lg:flex-row w-full max-w-6xl bg-white rounded-[2.5rem] shadow-premium overflow-hidden border-2 border-brand-soft animate-fade-up">
         
-        {/* Left Side: Brand & Benefits */}
-        <div className="lg:w-2/5 bg-brand-secondary p-12 text-white relative overflow-hidden hidden lg:flex flex-col justify-between border-r-2 border-white/10">
-          <div className="relative z-10">
-            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-8 shadow-lg">
-              <Stethoscope size={24} className="text-brand-secondary" />
-            </div>
-            <h1 className="text-4xl font-black mb-6 leading-tight text-white">
-              Начните путь к <br />
-              <span className="text-brand-soft">здоровью сегодня.</span>
-            </h1>
-            <p className="text-white text-lg leading-relaxed mb-12 font-bold">
-              Присоединяйтесь к тысячам пациентов, которые уже доверили нам заботу о своем благополучии.
-            </p>
-
-            <div className="space-y-6">
-              {[
-                'Запись к врачу в пару кликов',
-                'Доступ к анализам 24/7',
-                'Умная система симптомов',
-                'Персональные рекомендации'
-              ].map((benefit, i) => (
-                <div key={i} className="flex items-center space-x-3">
-                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white border border-white/30">
-                    <ShieldCheck size={14} />
-                  </div>
-                  <span className="text-sm font-black text-white">{benefit}</span>
-                </div>
-              ))}
-            </div>
+        {/* Left Side: Cat */}
+        <div className="lg:w-2/5 bg-brand-secondary p-8 text-white relative overflow-hidden hidden lg:flex flex-col items-center justify-center border-r-2 border-white/10">
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="absolute top-6 right-6 p-3 rounded-full bg-white/10 backdrop-blur-md border-2 border-white/20 hover:bg-white/20 transition-all z-20"
+            title={isDarkMode ? 'Светлая тема' : 'Тёмная тема'}
+          >
+            {isDarkMode ? <Sun size={20} className="text-white" /> : <Moon size={20} className="text-white" />}
+          </button>
+          
+          <div className="relative z-10 flex items-center justify-center h-full">
+            <AuthCat 
+              isTextField={focusedField === 'text'} 
+              isPasswordField={focusedField === 'password'} 
+              isDarkMode={isDarkMode}
+            />
           </div>
 
           {/* Decorative Elements */}
@@ -100,6 +93,8 @@ const RegisterPage = () => {
                     placeholder="Иванов Иван Иванович"
                     className="w-full pl-12 pr-4 py-4 rounded-2xl bg-brand-soft/20 border-2 border-brand-soft focus:border-brand-secondary focus:bg-white outline-none transition-all duration-300 font-bold text-brand-secondary placeholder:text-brand-secondary/40"
                     {...registerField('fullName')}
+                    onFocus={() => setFocusedField('text')}
+                    onBlur={() => setFocusedField(null)}
                   />
                 </div>
                 {errors.fullName && (
@@ -116,6 +111,8 @@ const RegisterPage = () => {
                     placeholder="name@example.com"
                     className="w-full pl-12 pr-4 py-4 rounded-2xl bg-brand-soft/20 border-2 border-brand-soft focus:border-brand-secondary focus:bg-white outline-none transition-all duration-300 font-bold text-brand-secondary placeholder:text-brand-secondary/40"
                     {...registerField('email')}
+                    onFocus={() => setFocusedField('text')}
+                    onBlur={() => setFocusedField(null)}
                   />
                 </div>
                 {errors.email && (
@@ -132,6 +129,8 @@ const RegisterPage = () => {
                     placeholder="+7 (999) 000-00-00"
                     className="w-full pl-12 pr-4 py-4 rounded-2xl bg-brand-soft/20 border-2 border-brand-soft focus:border-brand-secondary focus:bg-white outline-none transition-all duration-300 font-bold text-brand-secondary placeholder:text-brand-secondary/40"
                     {...registerField('phone')}
+                    onFocus={() => setFocusedField('text')}
+                    onBlur={() => setFocusedField(null)}
                   />
                 </div>
                 {errors.phone && (
@@ -148,6 +147,8 @@ const RegisterPage = () => {
                     placeholder="••••••••"
                     className="w-full pl-12 pr-4 py-4 rounded-2xl bg-brand-soft/20 border-2 border-brand-soft focus:border-brand-secondary focus:bg-white outline-none transition-all duration-300 font-black text-brand-secondary placeholder:text-brand-secondary/40"
                     {...registerField('password')}
+                    onFocus={() => setFocusedField('password')}
+                    onBlur={() => setFocusedField(null)}
                   />
                 </div>
                 {errors.password && (
@@ -164,6 +165,8 @@ const RegisterPage = () => {
                     placeholder="••••••••"
                     className="w-full pl-12 pr-4 py-4 rounded-2xl bg-brand-soft/20 border-2 border-brand-soft focus:border-brand-secondary focus:bg-white outline-none transition-all duration-300 font-black text-brand-secondary placeholder:text-brand-secondary/40"
                     {...registerField('confirmPassword')}
+                    onFocus={() => setFocusedField('password')}
+                    onBlur={() => setFocusedField(null)}
                   />
                 </div>
                 {errors.confirmPassword && (

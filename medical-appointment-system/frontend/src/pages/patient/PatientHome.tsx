@@ -4,32 +4,29 @@ import { Link } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { patientApi, type PatientDashboardResponse } from '../../services/api';
-import type { PatientNotificationResponse } from '../../services/api';
+import { useNotificationStore } from '../../stores/notificationStore';
+import { localizeNotification } from '../../utils/notificationText';
 
 const formatTime = (value: string) => value.slice(0, 5);
 
-const statusLabel = (status: string) => {
-  const map: Record<string, string> = {
-    SCHEDULED: 'Запланировано',
-    CONFIRMED: 'Подтверждено',
-    RESCHEDULED: 'Перенесено',
-    COMPLETED: 'Завершено',
-    CANCELLED: 'Отменено',
-    MISSED: 'Пропущено',
-  };
-  return map[status] || status;
+const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
+  SCHEDULED: { label: 'Запланировано', color: 'text-blue-600', bg: 'bg-blue-100' },
+  CONFIRMED: { label: 'Подтверждено', color: 'text-emerald-600', bg: 'bg-emerald-100' },
+  RESCHEDULED: { label: 'Перенесено', color: 'text-amber-600', bg: 'bg-amber-100' },
+  COMPLETED: { label: 'Завершено', color: 'text-green-600', bg: 'bg-green-100' },
+  CANCELLED: { label: 'Отменено', color: 'text-red-600', bg: 'bg-red-100' },
+  MISSED: { label: 'Пропущено', color: 'text-gray-600', bg: 'bg-gray-100' },
 };
 
 const PatientHome = () => {
   const user = useAuthStore((state) => state.user);
+  const { notifications, unreadCount, loadNotifications, markAsRead, deleteNotification } = useNotificationStore();
   const [dashboard, setDashboard] = useState<PatientDashboardResponse | null>(null);
-  const [notifications, setNotifications] = useState<PatientNotificationResponse[]>([]);
 
   const loadData = async () => {
     try {
-      const [dashboardData, notificationsData] = await Promise.all([patientApi.getDashboard(), patientApi.getNotifications()]);
+      const [dashboardData] = await Promise.all([patientApi.getDashboard(), loadNotifications()]);
       setDashboard(dashboardData);
-      setNotifications(notificationsData);
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Не удалось загрузить данные пациента');
     }
@@ -48,28 +45,16 @@ const PatientHome = () => {
     [dashboard]
   );
 
-  const markRead = async (notificationId: number) => {
-    await patientApi.setNotificationRead(notificationId, true);
-    loadData();
-  };
-
-  const removeNotification = async (notificationId: number) => {
-    await patientApi.deleteNotification(notificationId);
-    loadData();
-  };
 
   const upcoming = dashboard?.upcomingAppointments ?? [];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 pb-20 animate-fade-up bg-brand-bg">
+    <div className="max-w-7xl mx-auto px-4 pb-20 animate-fade-up bg-brand-bg">
       <header className="rounded-3xl bg-white border-2 border-brand-soft p-8 mb-8 shadow-sm">
         <p className="text-[10px] font-black text-brand-primary uppercase tracking-widest mb-2">Личный кабинет</p>
         <h1 className="text-3xl md:text-4xl font-black text-brand-secondary tracking-tight">
-          Здравствуйте, {user?.fullName?.split(' ')[0] || 'пациент'}
+          Здравствуйте, {user?.fullName?.split(' ')[1] || user?.fullName?.split(' ')[0] || 'пациент'}
         </h1>
-        <p className="text-brand-secondary font-bold text-sm mt-3 max-w-xl">
-          Запишитесь к врачу, смотрите ближайшие визиты и уведомления — всё в одном месте.
-        </p>
         <div className="flex flex-wrap gap-3 mt-6">
           <Link
             to="/patient/doctors"
@@ -136,9 +121,14 @@ const PatientHome = () => {
                         </p>
                       </div>
                     </div>
-                    <span className="text-[10px] font-black uppercase px-3 py-1 rounded-lg bg-white border border-brand-soft text-brand-secondary shrink-0">
-                      {statusLabel(a.status)}
-                    </span>
+                    {(() => {
+                      const status = statusConfig[a.status] || { label: a.status, color: 'text-gray-600', bg: 'bg-gray-100' };
+                      return (
+                        <span className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-xl ${status.bg} ${status.color} shrink-0`}>
+                          {status.label}
+                        </span>
+                      );
+                    })()}
                   </li>
                 ))}
               </ul>
@@ -153,28 +143,31 @@ const PatientHome = () => {
                 <Bell size={20} className="text-brand-primary" />
                 Уведомления
               </div>
-              <span className="text-[10px] font-black text-brand-primary">{notifications.filter((n) => !n.isRead).length} новых</span>
+              <span className="text-[10px] font-black text-brand-primary">{unreadCount} новых</span>
             </div>
             {notifications.length === 0 ? (
               <p className="text-sm font-bold text-brand-primary">Пока пусто.</p>
             ) : (
               <ul className="space-y-3 max-h-72 overflow-auto">
-                {notifications.slice(0, 5).map((item) => (
+                {notifications.slice(0, 5).map((notification) => {
+                  const item = localizeNotification(notification);
+                  return (
                   <li key={item.id} className="text-sm border-b border-brand-soft pb-3 last:border-0">
                     <p className="font-black text-brand-secondary">{item.title}</p>
                     <p className="text-xs font-bold text-brand-primary mt-1">{item.message}</p>
                     <div className="flex gap-2 mt-2">
                       {!item.isRead && (
-                        <button type="button" onClick={() => markRead(item.id)} className="text-[10px] font-black uppercase text-brand-secondary hover:underline">
+                        <button type="button" onClick={() => markAsRead(item.id)} className="text-[10px] font-black uppercase text-brand-secondary hover:underline">
                           Прочитано
                         </button>
                       )}
-                      <button type="button" onClick={() => removeNotification(item.id)} className="text-[10px] font-black uppercase text-status-error hover:underline">
+                      <button type="button" onClick={() => deleteNotification(item.id)} className="text-[10px] font-black uppercase text-status-error hover:underline">
                         Удалить
                       </button>
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             )}
           </section>

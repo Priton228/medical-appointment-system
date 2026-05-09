@@ -21,9 +21,10 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByEmail(username)
+        return login -> userRepository.findByUsername(login)
+                .or(() -> userRepository.findByEmail(login))
                 .map(user -> org.springframework.security.core.userdetails.User
-                        .withUsername(user.getEmail())
+                        .withUsername(user.getUsername())
                         .password(user.getPasswordHash())
                         .authorities(user.getRole().name())
                         .accountExpired(false)

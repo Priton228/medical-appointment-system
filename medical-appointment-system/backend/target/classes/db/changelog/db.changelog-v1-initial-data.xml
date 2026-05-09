@@ -7,6 +7,8 @@
 
     <!-- Add Admin User -->
     <changeSet id="2" author="medical-system">
+        <validCheckSum>9:f79122a0b5d1faee40531144f4715548</validCheckSum>
+        <validCheckSum>9:0ddf59d22dc612254ce0b922e92a07ea</validCheckSum>
         <!-- Insert Admin User -->
         <insert tableName="users">
             <column name="email" value="admin@medical-system.com"/>
@@ -21,6 +23,8 @@
 
     <!-- Add Doctor Users -->
     <changeSet id="3" author="medical-system">
+        <validCheckSum>9:f91b3e5bff56890704040fcf4b646e50</validCheckSum>
+        <validCheckSum>9:558f9e91a98f06ad8b60c407e88c3ace</validCheckSum>
         <!-- Insert Doctor 1 - Therapist -->
         <insert tableName="users">
             <column name="email" value="doctor.petrov@medical-system.com"/>

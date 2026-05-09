@@ -1,25 +1,30 @@
+import { useState } from 'react';
 import { Routes, Route, NavLink } from 'react-router-dom';
-import { Calendar, HeartPulse, User, Home, Stethoscope, ChevronRight } from 'lucide-react';
+import { Calendar, HeartPulse, User, Home, Stethoscope, ChevronRight, MapPin } from 'lucide-react';
 import SymptomsPage from './SymptomsPage';
 import DoctorsPage from './DoctorsPage';
 import AppointmentsPage from './AppointmentsPage';
 import ProfilePage from './ProfilePage';
 import PatientHome from './PatientHome';
+import PharmaciesPage from './PharmaciesPage';
+import ChatPanel from '../../components/chat/ChatPanel';
 
 const PatientDashboard = () => {
+  const [chatOpen, setChatOpen] = useState(false);
   const menuItems = [
     { to: '/patient', icon: Home, label: 'Главная', end: true },
     { to: '/patient/symptoms', icon: Stethoscope, label: 'Подобрать врача' },
     { to: '/patient/doctors', icon: HeartPulse, label: 'Все врачи' },
     { to: '/patient/appointments', icon: Calendar, label: 'Мои записи' },
+    { to: '/patient/pharmacies', icon: MapPin, label: 'Аптеки рядом' },
     { to: '/patient/profile', icon: User, label: 'Профиль' },
   ];
 
   return (
-    <div className="flex min-h-[calc(100vh-90px)] gap-8">
-      {/* Sidebar Nav */}
-      <aside className="fixed left-6 top-[110px] bottom-6 w-72 hidden xl:block">
-        <div className="bg-white h-full rounded-[2.5rem] p-6 border-2 border-brand-soft flex flex-col shadow-premium">
+    <div className="flex min-h-screen">
+      {/* Sidebar Nav - 'Г'-образная структура */}
+      <aside className="fixed left-4 top-[110px] bottom-6 w-72 hidden xl:block rounded-2xl bg-white dark:bg-gray-800 border-2 border-brand-soft dark:border-slate-600 shadow-premium">
+        <div className="h-full p-6 flex flex-col">
           <div className="mb-10 px-4">
             <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em]">Навигация</p>
           </div>
@@ -51,29 +56,38 @@ const PatientDashboard = () => {
             ))}
           </nav>
 
-          <div className="mt-auto p-6 bg-brand-soft/40 rounded-3xl border-2 border-brand-soft">
+          <div className="mt-auto p-6 bg-brand-soft/40 dark:bg-slate-700/40 rounded-2xl border-2 border-brand-soft dark:border-slate-600">
             <p className="text-xs font-black text-brand-secondary mb-2">Нужна помощь?</p>
             <p className="text-[10px] text-brand-secondary font-bold leading-relaxed mb-4">Наша служба поддержки работает 24/7 для вашего здоровья.</p>
-            <a
-              href="mailto:support@medical-system.local?subject=Поддержка%20пациента"
+            <button
+              type="button"
+              onClick={() => setChatOpen(true)}
               className="block w-full py-3 bg-brand-secondary text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md hover:shadow-lg transition-all border border-brand-soft/20 text-center"
             >
               Написать в поддержку
-            </a>
+            </button>
           </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 xl:ml-80">
+      <div className="flex-1 xl:ml-80 pt-[110px] px-4">
         <Routes>
           <Route index element={<PatientHome />} />
           <Route path="symptoms" element={<SymptomsPage />} />
           <Route path="doctors" element={<DoctorsPage />} />
           <Route path="appointments" element={<AppointmentsPage />} />
+          <Route path="pharmacies" element={<PharmaciesPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Routes>
       </div>
+      <ChatPanel
+        open={chatOpen}
+        onClose={() => setChatOpen(false)}
+        title="Поддержка"
+        subtitle="Чат с администратором"
+        partnerName="Администратор"
+      />
     </div>
   );
 };

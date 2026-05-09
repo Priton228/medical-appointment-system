@@ -1,8 +1,6 @@
 package com.medical.controller;
 
-import com.medical.dto.AuthResponse;
-import com.medical.dto.LoginRequest;
-import com.medical.dto.RegisterRequest;
+import com.medical.dto.*;
 import com.medical.entity.Role;
 import com.medical.service.AuthService;
 import jakarta.validation.Valid;
@@ -38,5 +36,23 @@ private final AuthService authService;
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> authenticate(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.authenticate(request));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> requestPasswordReset(@RequestBody PasswordResetRequest request) {
+        authService.requestPasswordReset(request.email());
+        return ResponseEntity.ok(java.util.Map.of("message", "Код отправлен на ваш email"));
+    }
+
+    @PostMapping("/verify-code")
+    public ResponseEntity<?> verifyResetCode(@RequestBody VerifyCodeRequest request) {
+        authService.verifyResetCode(request.email(), request.code());
+        return ResponseEntity.ok(java.util.Map.of("message", "Код подтверждён"));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody NewPasswordRequest request) {
+        authService.resetPassword(request.email(), request.code(), request.newPassword(), request.confirmPassword());
+        return ResponseEntity.ok(java.util.Map.of("message", "Пароль успешно изменён"));
     }
 }

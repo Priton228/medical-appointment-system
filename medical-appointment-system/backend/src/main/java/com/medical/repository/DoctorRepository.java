@@ -14,7 +14,9 @@ import java.util.Optional;
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     Optional<Doctor> findByUserId(Long userId);
     Optional<Doctor> findByUserEmail(String email);
+    Optional<Doctor> findByUserUsername(String username);
     List<Doctor> findBySpecializationIdIn(List<Long> specializationIds);
+    List<Doctor> findBySpecializationId(Long specializationId);
 
     @Query("SELECT d FROM Doctor d JOIN d.user u WHERE LOWER(u.fullName) LIKE LOWER(CONCAT('%', :name, '%'))")
     Page<Doctor> searchByName(String name, Pageable pageable);

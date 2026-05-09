@@ -31,4 +31,19 @@ public class Patient {
 
     @Column(name = "emergency_contact")
     private String emergencyContact;
+
+    @Column(name = "chronic_diseases", length = 1000)
+    private String chronicDiseases;
+
+    @Column(name = "allergies", length = 1000)
+    private String allergies;
+
+    @Column(name = "blood_type", length = 10)
+    private String bloodType;
+
+    @Column(name = "height_cm")
+    private Integer heightCm;
+
+    @Column(name = "weight_kg")
+    private Integer weightKg;
 }

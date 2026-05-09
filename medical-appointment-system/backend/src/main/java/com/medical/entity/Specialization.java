@@ -3,6 +3,9 @@ package com.medical.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "specializations")
 @Getter
@@ -21,4 +24,8 @@ public class Specialization {
 
     @Column(length = 1000)
     private String description;
+
+    @OneToMany(mappedBy = "specialization", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<SymptomSpecialization> symptomSpecializations = new ArrayList<>();
 }

@@ -11,6 +11,7 @@ public record UpsertSlotRequest(
         @NotNull(message = "Время начала обязательно")
         LocalTime startTime,
         @NotNull(message = "Время окончания обязательно")
-        LocalTime endTime
+        LocalTime endTime,
+        Boolean isBlocked
 ) {
 }
