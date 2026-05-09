@@ -65,7 +65,7 @@ class AdminCabinetServiceTest {
 
     @BeforeEach
     void setUp() {
-        adminUser = User.builder().id(1L).username("admin").fullName("Admin").role(Role.ADMIN).build();
+        adminUser = User.builder().id(1L).username("admin").fullName("Admin").email("admin@test.com").role(Role.ADMIN).build();
         patientUser = User.builder().id(2L).username("patient1").fullName("Patient One").email("p1@test.com").phone("+375111111111").role(Role.PATIENT).isBlocked(false).build();
         doctorUser = User.builder().id(3L).username("doctor1").fullName("Doctor One").email("d1@test.com").role(Role.DOCTOR).isBlocked(false).build();
     }

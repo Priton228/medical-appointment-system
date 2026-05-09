@@ -3,7 +3,6 @@ package com.medical.service;
 import com.medical.dto.admin.SystemStatusResponse;
 import com.medical.repository.AppointmentRepository;
 import com.medical.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,13 +37,9 @@ class SystemStatusServiceTest {
     @InjectMocks
     private SystemStatusService systemStatusService;
 
-    @BeforeEach
-    void setUp() throws Exception {
-        when(dataSource.getConnection()).thenReturn(connection);
-    }
-
     @Test
     void getStatus_shouldReturnUp_whenAllOk() throws Exception {
+        when(dataSource.getConnection()).thenReturn(connection);
         when(connection.isValid(2)).thenReturn(true);
         when(userRepository.count()).thenReturn(10L);
         when(appointmentRepository.count()).thenReturn(5L);
@@ -63,6 +58,7 @@ class SystemStatusServiceTest {
 
     @Test
     void getStatus_shouldReturnDown_whenDatabaseFails() throws Exception {
+        when(dataSource.getConnection()).thenReturn(connection);
         when(connection.isValid(2)).thenThrow(new RuntimeException("DB error"));
 
         SystemStatusResponse status = systemStatusService.getStatus();
@@ -73,14 +69,15 @@ class SystemStatusServiceTest {
     }
 
     @Test
-    void getStatus_shouldReturnDegraded_whenRepositoryFails() throws Exception {
+    void getStatus_shouldReturnDown_whenRepositoryFails() throws Exception {
+        when(dataSource.getConnection()).thenReturn(connection);
         when(connection.isValid(2)).thenReturn(true);
         when(userRepository.count()).thenThrow(new RuntimeException("Repo error"));
         when(appointmentRepository.count()).thenReturn(5L);
 
         SystemStatusResponse status = systemStatusService.getStatus();
 
-        assertEquals("DEGRADED", status.overallStatus());
+        assertEquals("DOWN", status.overallStatus());
     }
 
     @Test
