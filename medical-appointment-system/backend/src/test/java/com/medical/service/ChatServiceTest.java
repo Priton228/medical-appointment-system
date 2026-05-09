@@ -135,7 +135,15 @@ class ChatServiceTest {
     void sendMessage_shouldSucceed_whenAdminToPatient() {
         when(authentication.getPrincipal()).thenReturn(adminUser);
         when(userRepository.findById(1L)).thenReturn(Optional.of(patientUser));
-        when(chatMessageRepository.save(any(ChatMessage.class))).thenReturn(message);
+        ChatMessage adminMessage = ChatMessage.builder()
+                .id(101L)
+                .sender(adminUser)
+                .recipient(patientUser)
+                .content("Reply from admin")
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+        when(chatMessageRepository.save(any(ChatMessage.class))).thenReturn(adminMessage);
         when(userNotificationRepository.save(any(UserNotification.class))).thenReturn(null);
         doNothing().when(emailNotificationService).sendEmail(any(), any(), any());
 
@@ -144,6 +152,7 @@ class ChatServiceTest {
 
         assertNotNull(response);
         assertEquals("Reply from admin", response.content());
+        assertEquals(2L, response.senderId());
     }
 
     @Test
