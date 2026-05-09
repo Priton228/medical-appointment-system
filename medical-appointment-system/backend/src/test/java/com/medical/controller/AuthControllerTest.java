@@ -31,7 +31,7 @@ class AuthControllerTest {
     private AuthService authService;
 
     private final AuthResponse mockResponse = new AuthResponse(
-            "token123", "refresh123", "PATIENT", "Test User", null, "test@test.com", "+375291111111"
+            "token123", "refresh123", "Bearer", 3600L, "PATIENT", 1L, "testuser", "Test User"
     );
 
     @Test
@@ -47,7 +47,7 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("token123"))
+                .andExpect(jsonPath("$.accessToken").value("token123"))
                 .andExpect(jsonPath("$.role").value("PATIENT"));
     }
 
@@ -62,7 +62,7 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("token123"))
+                .andExpect(jsonPath("$.accessToken").value("token123"))
                 .andExpect(jsonPath("$.fullName").value("Test User"));
     }
 
@@ -115,7 +115,7 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("token123"));
+                .andExpect(jsonPath("$.accessToken").value("token123"));
     }
 
     @Test
@@ -131,6 +131,6 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("token123"));
+                .andExpect(jsonPath("$.accessToken").value("token123"));
     }
 }
