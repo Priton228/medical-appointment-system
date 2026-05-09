@@ -59,6 +59,7 @@ class AuthServiceTest {
     void setUp() {
         validRequest = new RegisterRequest(
                 "Иванов Иван",
+                "ivanuser",
                 "ivan@test.com",
                 "+375291234567",
                 "password123",
@@ -105,7 +106,7 @@ class AuthServiceTest {
     @Test
     void register_shouldThrowBusinessException_whenPasswordMismatch() {
         RegisterRequest badRequest = new RegisterRequest(
-                "Иванов Иван", "ivan@test.com", "+375291234567",
+                "Иванов Иван", "ivanuser", "ivan@test.com", "+375291234567",
                 "password123", "different"
         );
 
